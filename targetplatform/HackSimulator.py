@@ -1,11 +1,15 @@
-from tkinter import Tk, Canvas
-from targetplatform import *
+import threading
+
 import keyboard
+import numpy as np
+from cvpubsubs.webcam_pub import VideoHandlerThread
+
+from targetplatform import *
 
 
 class HackSimulator:
 
-    def __init__(self, rom, show_screen=False):
+    def __init__(self, rom, show_screen=False, fps_limit=10):
         self._ram = [0] * RAM_SIZE
         self._rom = rom
         self._D = 0
@@ -14,11 +18,15 @@ class HackSimulator:
         self._show_screen = show_screen
         self._ticks = 0
         if show_screen:
-            self._ui = Tk()
-            self._canvas = Canvas(self._ui, bg="white", height=256, width=512)
-            self._canvas.pack()
+            self._screen = np.ones((SCREEN_HEIGHT, SCREEN_WIDTH))
+            self._video_handler_thread = VideoHandlerThread(video_source=self._screen,
+                                                            callbacks=lambda frame, cam_id: self._screen,
+                                                            fps_limit=fps_limit)
 
     def run(self, max_ticks=None):
+        if self._show_screen:
+            thread = threading.Thread(target=lambda: self._video_handler_thread.display())
+            thread.start()
         while self._PC < len(self._rom) and (not max_ticks or self._ticks < max_ticks):
             self.run_next_cmd()
 
@@ -26,8 +34,6 @@ class HackSimulator:
         if self._PC >= len(self._rom):
             raise ValueError("The program is over!")
         self._ticks = self._ticks + 1
-        if self._show_screen:
-            self._ui.update()
         cmd = self._rom[self._PC]
         self._PC = self._PC + 1
         if get_nth_bit(cmd, 15) == 0:
@@ -75,8 +81,7 @@ class HackSimulator:
         row = batch_num >> 5
         col = batch_num & 0b11111
         for i in range(0, BITS):
-            self._canvas.create_rectangle(((col << 4) + i + 2, row + 2, (col << 4) + i + 3, row + 3),
-                                          fill=("black" if get_nth_bit(val, i) else "white"), width=0)
+            self._screen[row][(col << 4) + i] = (~get_nth_bit(val, i) & 1)
 
     def _get_m(self):
         if self._A != KEYBOARD:
