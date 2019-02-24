@@ -25,8 +25,6 @@ class HackSimulator:
     def run_next_cmd(self):
         if self._PC >= len(self._rom):
             raise ValueError("The program is over!")
-        if self._ticks % 100000 == 0:
-            print(self._ticks)
         self._ticks = self._ticks + 1
         if self._show_screen:
             self._ui.update()

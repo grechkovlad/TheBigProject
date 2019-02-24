@@ -24,7 +24,6 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(set_nth_bit_zero(0b0101010101010101, 1), 0b0101010101010101)
         self.assertEqual(set_nth_bit_zero(0b0101010101010101, 4), 0b0101010101000101)
 
-
     def test_parse_c_cmd(self):
         dest, comp, jump = parse_c_cmd(0b1110000111011001)
         self.assertEqual(dest, 0b011)
@@ -185,13 +184,14 @@ class MyTestCase(unittest.TestCase):
         platform.run()
         self.assertEqual(platform._ram[0], 1)
 
-    """
-    def test_keyboard(self):
-        pong_prog = list(map(lambda str : int(str, 2), open('D:/NAND/nand2tetris/projects/06/Pong.hack').readlines()))
-        platform = HackSimulator(pong_prog, True)
-        platform.run()
-
-    """
+    def test_pong(self):
+        pong_prog = list(map(lambda str: int(str, 2), open('pong.hack').readlines()))
+        platform = HackSimulator(pong_prog)
+        for i in range(0, 5100000):
+            platform.run_next_cmd()
+        expected_ram = list(map(int, open('pong_5.1m.dump').readlines()))
+        for i in range(len(expected_ram)):
+            self.assertEqual(platform._ram[i], expected_ram[i])
 
 
 if __name__ == '__main__':
