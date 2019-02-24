@@ -1,2 +1,2 @@
 # TheBigProject
-Languages, compilers, hardware simulation and other stuff insipred by 'From NAND to tetris course'
+Languages, compilers, hardware emulation and other stuff insipred by 'From NAND to tetris' course
