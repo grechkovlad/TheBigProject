@@ -2,7 +2,6 @@ import threading
 
 import keyboard
 import numpy as np
-from cvpubsubs.webcam_pub import VideoHandlerThread
 
 from targetplatform import *
 
@@ -18,16 +17,27 @@ class HackSimulator:
         self._show_screen = show_screen
         self._ticks = 0
         if show_screen:
+            from cvpubsubs.webcam_pub import VideoHandlerThread
             self._screen = np.ones((SCREEN_HEIGHT, SCREEN_WIDTH))
             self._video_handler_thread = VideoHandlerThread(video_source=self._screen,
                                                             callbacks=lambda frame, cam_id: self._screen,
                                                             fps_limit=fps_limit)
 
+    def _display_screen(self):
+        from cvpubsubs.window_sub import SubscriberWindows
+        from cvpubsubs.webcam_pub.callbacks import global_cv_display_callback
+        self._video_handler_thread.callbacks.append(global_cv_display_callback)
+        self._video_handler_thread.start()
+        window = SubscriberWindows(window_names=["Hack Computer Emulator"],
+                                   video_sources=[self._video_handler_thread.cam_id])
+        window.loop()
+        self._video_handler_thread.join()
+
     def run(self, max_ticks=None):
         if self._show_screen:
-            thread = threading.Thread(target=lambda: self._video_handler_thread.display())
+            thread = threading.Thread(target=self._display_screen)
             thread.start()
-        while self._PC < len(self._rom) and (not max_ticks or self._ticks < max_ticks):
+        while self._PC < len(self._rom) and (not max_ticks or self._ticks < max_ticks) and (not self._show_screen or thread.is_alive()):
             self.run_next_cmd()
 
     def run_next_cmd(self):
