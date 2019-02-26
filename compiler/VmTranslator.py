@@ -576,7 +576,7 @@ def parseThreeWords(w1, w2, val):
         return CallCmd(w2, val);
     if (w1 == 'function'):
         return FunctionCmd(w2, val);
-    raise ValueError("Can't parse %s %s %d" % (type, seg, val))
+    raise ValueError("Can't parse %s %s %d" % (w1, w2, val))
 
 
 def parseBranch(w1, w2):
@@ -622,15 +622,15 @@ def parse_path(path):
     return (path_list[:-1], className)
 
 
-def main():
+def main(source, target):
     import os
-    if not os.path.isdir(sys.argv[1]):
-        dir, className = parse_path(sys.argv[1]);
-        with open('/'.join(dir) + '/' + className + '.asm', 'w') as outfile:
-            outfile.write("\n".join(translate_file(sys.argv[1])))
+    if not os.path.isdir(source):
+        dir, className = parse_path(source);
+        with open(target + '/' + className + '.asm', 'w') as outfile:
+            outfile.write("\n".join(translate_file(source)))
         return;
-    vm_files = map(lambda filename: os.path.join(sys.argv[1], filename),
-                   filter(lambda filename: filename.endswith('.vm'), os.listdir(sys.argv[1])))
+    vm_files = map(lambda filename: os.path.join(source, filename),
+                   filter(lambda filename: filename.endswith('.vm'), os.listdir(source)))
     full_programm = ['@256',
                      'D = A',
                      '@SP',
@@ -638,9 +638,5 @@ def main():
     full_programm += list(translate_lines(['call Sys.init 0']))
     for vm_file in vm_files:
         full_programm += list(translate_file(vm_file))
-    with open(sys.argv[1] + '/' + sys.argv[1].split(os.sep)[-1] + '.asm', 'w') as outfile:
+    with open(target + '/' + source.split(os.sep)[-1] + '.asm', 'w') as outfile:
         outfile.write("\n".join(full_programm))
-
-
-if __name__ == "__main__":
-    main()

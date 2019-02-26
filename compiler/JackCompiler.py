@@ -767,16 +767,10 @@ def compileFile(file, dir):
     writeResult(file, dir, vmCode);
 
 
-def main(target):
-    if os.path.isfile(target):
-        dir = os.path.abspath(os.path.join(target, '..'));
-        files = [target];
+def main(source, target):
+    if os.path.isfile(source):
+        files = [source];
     else:
-        dir = target;
-        files = glob.glob("%s/*.jack" % target);
+        files = glob.glob("%s/*.jack" % source);
     for file in files:
-        compileFile(file, dir);
-
-
-if __name__ == '__main__':
-    main(argv[1]);
+        compileFile(file, target);

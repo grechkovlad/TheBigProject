@@ -1,8 +1,3 @@
-import sys
-
-sourcePath = sys.argv[1]
-
-
 def is_garbage(line):
     return (not without_comment(line)) or (without_comment(line).isspace());
 
@@ -24,10 +19,6 @@ def remove_inline_comments(program):
 
 def remove_labels_defs(program):
     return filter(lambda line: not is_label_definition(line), program);
-
-
-with open(sourcePath, 'r') as sourceFile:
-    program = sourceFile.readlines();
 
 
 def is_label_definition(line):
@@ -185,12 +176,18 @@ def to_binary(program):
     return map(lambda line: line_to_binary(line), program);
 
 
-sensible_symbols = list(remove_inline_comments(remove_garbage(program)));
-symbol_table = {};
-set_predefined_symbols(symbol_table);
-collect_labels(sensible_symbols, symbol_table);
-resolved = resolve_symbols(remove_labels_defs(sensible_symbols), symbol_table);
-binary = to_binary(resolved);
+def main(source, target):
 
-with open('res.hack', 'w') as out_file:
-    out_file.write('\n'.join(binary))
+    with open(source, 'r') as sourceFile:
+        program = sourceFile.readlines();
+
+    sensible_symbols = list(remove_inline_comments(remove_garbage(program)));
+    symbol_table = {};
+    set_predefined_symbols(symbol_table);
+    collect_labels(sensible_symbols, symbol_table);
+    resolved = resolve_symbols(remove_labels_defs(sensible_symbols), symbol_table);
+    binary = to_binary(resolved);
+
+    from os.path import splitext
+    with open(target + "/" + splitext(source)[0] + ".hack", 'w') as out_file:
+        out_file.write('\n'.join(binary))
