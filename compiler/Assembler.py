@@ -188,6 +188,8 @@ def main(source, target):
     resolved = resolve_symbols(remove_labels_defs(sensible_symbols), symbol_table);
     binary = to_binary(resolved);
 
-    from os.path import splitext
-    with open(target + "/" + splitext(source)[0] + ".hack", 'w') as out_file:
+    from os import makedirs
+    from pathlib import Path
+    makedirs(Path(target).parent, exist_ok=True)
+    with open(target, 'w') as out_file:
         out_file.write('\n'.join(binary))

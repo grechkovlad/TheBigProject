@@ -624,9 +624,10 @@ def parse_path(path):
 
 def main(source, target):
     import os
+    from pathlib import Path
+    os.makedirs(Path(target).parent, exist_ok=True)
     if not os.path.isdir(source):
-        dir, className = parse_path(source);
-        with open(target + '/' + className + '.asm', 'w') as outfile:
+        with open(target, 'w') as outfile:
             outfile.write("\n".join(translate_file(source)))
         return;
     vm_files = map(lambda filename: os.path.join(source, filename),
@@ -638,5 +639,5 @@ def main(source, target):
     full_programm += list(translate_lines(['call Sys.init 0']))
     for vm_file in vm_files:
         full_programm += list(translate_file(vm_file))
-    with open(target + '/' + source.split(os.sep)[-1] + '.asm', 'w') as outfile:
+    with open(target, 'w') as outfile:
         outfile.write("\n".join(full_programm))

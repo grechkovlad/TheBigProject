@@ -757,7 +757,7 @@ def compileProgramm(file):
 
 def writeResult(file, dir, result):
     className = os.path.splitext(os.path.basename(file))[0];
-    with open("%s/%s.vm" % (dir, className), "w") as out:
+    with open(os.path.join(dir, className + ".vm"), "w") as out:
         out.write("\n".join(result));
 
 
@@ -772,5 +772,6 @@ def main(source, target):
         files = [source];
     else:
         files = glob.glob("%s/*.jack" % source);
+    os.makedirs(target, exist_ok=True)
     for file in files:
         compileFile(file, target);
