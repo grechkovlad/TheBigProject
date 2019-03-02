@@ -1,11 +1,8 @@
-import sys
-
-
 class Context:
-    classname = None
-    cmpCount = 0
-    funcName = ""
-    retCount = 0
+    class_name = None
+    cmp_count = 0
+    func_name = ""
+    ret_count = 0
 
 
 class VmCmd:
@@ -92,7 +89,7 @@ class PushFixedSegmentCmd(PushCmd):
 
 class PushStaticCmd(PushFixedSegmentCmd):
     def _get_addr(self):
-        return Context.classname + '.' + str(self.x)
+        return Context.class_name + '.' + str(self.x)
 
     def _get_fixed_addr(self):
         return '16'
@@ -186,7 +183,7 @@ class PopFixedSegmentCmd(PopCmd):
 
 class PopStaticCmd(PopFixedSegmentCmd):
     def _get_addr(self):
-        return Context.classname + '.' + str(self.x)
+        return Context.class_name + '.' + str(self.x)
 
     def _get_fixed_addr(self):
         return '16'
@@ -276,25 +273,25 @@ class OrCmd(NonCompArithmCmd):
 
 class CmpCmd(BinaryArithmCmd):
     def translate(self):
-        Context.cmpCount = Context.cmpCount + 1
+        Context.cmp_count = Context.cmp_count + 1
         return ['@SP',
                 'M = M - 1',
                 'A = M',
                 'D = M',
                 'A = A - 1',
                 'D = M - D',
-                '@CMP_TRUE' + str(Context.cmpCount),
+                '@CMP_TRUE' + str(Context.cmp_count),
                 'D;' + self._get_jump_cond(),
                 '@SP',
                 'A = M - 1',
                 'M = 0',
-                '@CMP_END' + str(Context.cmpCount),
+                '@CMP_END' + str(Context.cmp_count),
                 '0;JMP',
-                '(CMP_TRUE' + str(Context.cmpCount) + ')',
+                '(CMP_TRUE' + str(Context.cmp_count) + ')',
                 '@SP',
                 'A = M - 1',
                 'M = -1',
-                '(CMP_END' + str(Context.cmpCount) + ')']
+                '(CMP_END' + str(Context.cmp_count) + ')']
 
 
 class LtCmd(CmpCmd):
@@ -313,11 +310,11 @@ class EqCmd(CmpCmd):
 
 
 def get_simple_label_name(str):
-    return '%s$%s' % (Context.funcName, str);
+    return '%s$%s' % (Context.func_name, str);
 
 
 def get_ret_label_name():
-    return '%s$ret.%d' % (Context.funcName, Context.retCount);
+    return '%s$ret.%d' % (Context.func_name, Context.ret_count);
 
 
 def get_function_label_name(name):
@@ -368,7 +365,7 @@ class CallCmd(VmCmd):
         self.arg_num = arg_num;
 
     def translate(self):
-        Context.retCount = Context.retCount + 1;
+        Context.ret_count = Context.ret_count + 1;
         return ['@%s' % get_ret_label_name(),
                 'D = A',
                 '@SP',
@@ -423,7 +420,7 @@ class CallCmd(VmCmd):
 
 class ReturnCmd(VmCmd):
     def translate(self):
-        return ['//return %s' % Context.funcName,
+        return ['//return %s' % Context.func_name,
                 '@ARG',
                 'D = M',
                 '@R13',
@@ -484,7 +481,7 @@ class FunctionCmd(VmCmd):
         self.var_num = var_num;
 
     def translate(self):
-        Context.funcName = self.name;
+        Context.func_name = self.name;
         return ['(%s)' % get_function_label_name(self.name),
                 '@%d' % self.var_num,
                 'D = A',
@@ -503,37 +500,37 @@ class FunctionCmd(VmCmd):
 
 
 def is_empty(line):
-    if (line.startswith('//')):
+    if line.startswith('//'):
         return True;
     else:
         return line.strip() == '';
 
 
-def parseOneWord(line):
-    if (line == 'return'):
+def parse_one_word(line):
+    if line == 'return':
         return ReturnCmd();
-    if (line == 'add'):
+    if line == 'add':
         return AddCmd();
-    if (line == 'sub'):
+    if line == 'sub':
         return SubCmd();
-    if (line == 'eq'):
+    if line == 'eq':
         return EqCmd();
-    if (line == 'gt'):
+    if line == 'gt':
         return GtCmd();
-    if (line == 'lt'):
+    if line == 'lt':
         return LtCmd();
-    if (line == 'and'):
+    if line == 'and':
         return AndCmd();
-    if (line == 'or'):
+    if line == 'or':
         return OrCmd();
-    if (line == 'neg'):
+    if line == 'neg':
         return NegCmd();
-    if (line == 'not'):
+    if line == 'not':
         return NotCmd()
     raise ValueError("Can't parse %s" % line)
 
 
-def parseThreeWords(w1, w2, val):
+def parse_three_words(w1, w2, val):
     if w1 == 'push':
         if w2 == 'local':
             return PushLocalCmd(val);
@@ -543,73 +540,73 @@ def parseThreeWords(w1, w2, val):
             return PushThisCmd(val);
         if w2 == 'that':
             return PushThatCmd(val);
-        if (w2 == 'constant'):
+        if w2 == 'constant':
             return PushConstCmd(val);
-        if (w2 == 'static'):
+        if w2 == 'static':
             return PushStaticCmd(val)
-        if (w2 == 'temp'):
+        if w2 == 'temp':
             return PushTempCmd(val)
-        if (w2 == 'pointer'):
-            if (val == 0):
+        if w2 == 'pointer':
+            if val == 0:
                 return PushPointerZeroCmd();
-            if (val == 1):
+            if val == 1:
                 return PushPointerOneCmd();
-    if (w1 == 'pop'):
-        if (w2 == 'local'):
+    if w1 == 'pop':
+        if w2 == 'local':
             return PopLocalCmd(val);
-        if (w2 == 'argument'):
+        if w2 == 'argument':
             return PopArgCmd(val);
-        if (w2 == 'this'):
+        if w2 == 'this':
             return PopThisCmd(val);
-        if (w2 == 'that'):
+        if w2 == 'that':
             return PopThatCmd(val);
-        if (w2 == 'static'):
+        if w2 == 'static':
             return PopStaticCmd(val)
-        if (w2 == 'temp'):
+        if w2 == 'temp':
             return PopTempCmd(val)
-        if (w2 == 'pointer'):
-            if (val == 0):
+        if w2 == 'pointer':
+            if val == 0:
                 return PopPointerZeroCmd();
-            if (val == 1):
+            if val == 1:
                 return PopPointerOneCmd();
-    if (w1 == 'call'):
+    if w1 == 'call':
         return CallCmd(w2, val);
-    if (w1 == 'function'):
+    if w1 == 'function':
         return FunctionCmd(w2, val);
     raise ValueError("Can't parse %s %s %d" % (w1, w2, val))
 
 
-def parseBranch(w1, w2):
-    if (w1 == 'label'):
+def parse_branch(w1, w2):
+    if w1 == 'label':
         return LabelCmd(w2);
-    if (w1 == 'goto'):
+    if w1 == 'goto':
         return GotoCmd(w2);
-    if (w1 == 'if-goto'):
+    if w1 == 'if-goto':
         return IfGotoCmd(w2);
     raise ValueError("Can't parse branch %s %s" % (w1, w2));
 
 
-def parseLine(line):
-    if (line.find('//') >= 0):
+def parse_line(line):
+    if line.find('//') >= 0:
         line = line[:line.find('//')];
     parts = line.split();
-    if (len(parts) == 1):
-        return parseOneWord(parts[0]);
-    if (len(parts) == 3):
-        return parseThreeWords(parts[0], parts[1], int(parts[2]));
-    if (len(parts) == 2):
-        return parseBranch(parts[0], parts[1])
+    if len(parts) == 1:
+        return parse_one_word(parts[0]);
+    if len(parts) == 3:
+        return parse_three_words(parts[0], parts[1], int(parts[2]));
+    if len(parts) == 2:
+        return parse_branch(parts[0], parts[1])
     raise ValueError("Can't parse line %s" % line)
 
 
 def translate_lines(lines):
-    vm_programm = map(parseLine, filter(lambda line: not is_empty(line), lines))
+    vm_programm = map(parse_line, filter(lambda line: not is_empty(line), lines))
     import itertools
     return itertools.chain.from_iterable(map(lambda cmd: cmd.translate(), vm_programm))
 
 
 def translate_file(path):
-    _, Context.classname = parse_path(path)
+    _, Context.class_name = parse_path(path)
     with open(path, 'r') as sourceFile:
         lines = sourceFile.readlines();
         return translate_lines(lines)
@@ -619,7 +616,7 @@ def parse_path(path):
     import os
     path_list = path.split(os.sep)
     className = path_list[-1].split('.')[0]
-    return (path_list[:-1], className)
+    return path_list[:-1], className
 
 
 def main(source, target):
