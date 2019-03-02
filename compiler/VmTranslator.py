@@ -420,8 +420,7 @@ class CallCmd(VmCmd):
 
 class ReturnCmd(VmCmd):
     def translate(self):
-        return ['//return %s' % Context.func_name,
-                '@ARG',
+        return ['@ARG',
                 'D = M',
                 '@R13',
                 'M = D',
