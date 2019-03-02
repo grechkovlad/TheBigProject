@@ -1,6 +1,6 @@
 import unittest
 
-from targetplatform import get_nth_bit, set_nth_bit_zero, parse_c_cmd, RAM_SIZE
+from targetplatform import get_nth_bit, set_nth_bit_zero, parse_c_cmd, RAM_SIZE, read_program
 from targetplatform.HackSimulator import HackSimulator
 
 
@@ -149,7 +149,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(platform._ram[17], 16704)
 
     def test_basic_loop(self):
-        loop_prog = list(map(lambda str: int(str, 2), open('basic_loop.hack').readlines()))
+        loop_prog = read_program('basic_loop.hack')
         platform = HackSimulator(loop_prog)
         platform._ram[0] = 256
         platform._ram[1] = 300
@@ -185,7 +185,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(platform._ram[0], 1)
 
     def test_pong(self):
-        pong_prog = list(map(lambda str: int(str, 2), open('pong.hack').readlines()))
+        pong_prog = read_program('pong.hack')
         platform = HackSimulator(pong_prog)
         for i in range(0, 5100000):
             platform.run_next_cmd()

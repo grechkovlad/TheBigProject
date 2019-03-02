@@ -86,6 +86,9 @@ def parse_c_cmd(cmd):
     return (cmd & 0b0000000000111000) >> 3, (cmd & 0b0001111111000000) >> 6, (cmd & 0b0000000000000111)
 
 
+def read_program(file):
+    return list(map(lambda line: int(line, 2), open(file).readlines()))
+
 RAM_SIZE = 24577
 ROM_SIZE = pow(2, 15)
 BITS = 16
