@@ -89,22 +89,11 @@ class PushTempCmd(PushFixedSegmentCmd):
 
 
 class PushPointerCmd(PushCmd):
-    ...
+    def __init__(self, segment_name):
+        self.name = segment_name
 
-
-class PushPointerZeroCmd(PushPointerCmd):
     def translate(self):
-        return ['@THIS',
-                'D = M',
-                '@SP',
-                'M = M + 1',
-                'A = M - 1',
-                'M = D']
-
-
-class PushPointerOneCmd(PushPointerCmd):
-    def translate(self):
-        return ['@THAT',
+        return ['@%s' % self.name,
                 'D = M',
                 '@SP',
                 'M = M + 1',
@@ -194,12 +183,12 @@ class PopTempCmd(PopFixedSegmentCmd):
 
 
 class PopPointerCmd(PopCmd):
-
-    def _store_pointer_to_r13(self):
-        return ['@' + self._get_segment_name(),
-                'D = A',
-                '@R13',
-                'M = D'];
+    def translate(self):
+        return ['@SP',
+                'AM = M - 1',
+                'D = M',
+                '@%s' % self._get_segment_name(),
+                'M = D']
 
 
 class PopPointerZeroCmd(PopPointerCmd):
@@ -530,9 +519,9 @@ def parse_three_words(w1, w2, val):
             return PushTempCmd(val)
         if w2 == 'pointer':
             if val == 0:
-                return PushPointerZeroCmd();
+                return PushPointerCmd("THIS")
             if val == 1:
-                return PushPointerOneCmd();
+                return PushPointerCmd("THAT")
     if w1 == 'pop':
         if w2 == 'local':
             return PopLocalCmd(val);
