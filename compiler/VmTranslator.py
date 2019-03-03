@@ -23,10 +23,9 @@ class PushCmd(MemoryCmd):
 
     def _push_D_to_stack(self):
         return ['@SP',
-                'A = M',
-                'M = D',
-                '@SP',
-                'M = M + 1'];
+                'M = M + 1',
+                'A = M - 1',
+                'M = D'];
 
 
 class PushRegularSegmentCmd(PushCmd):
