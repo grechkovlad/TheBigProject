@@ -88,6 +88,14 @@ class PushFixedSegmentCmd(PushCmd):
 
 
 class PushStaticCmd(PushFixedSegmentCmd):
+    def translate(self):
+        return ['@%s' % self._get_addr(),
+                'D = M',
+                '@SP',
+                'M = M + 1',
+                'A = M - 1',
+                'M = D']
+
     def _get_addr(self):
         return Context.class_name + '.' + str(self.x)
 
@@ -181,6 +189,13 @@ class PopFixedSegmentCmd(PopCmd):
 
 
 class PopStaticCmd(PopFixedSegmentCmd):
+    def translate(self):
+        return ['@SP',
+                'AM = M - 1',
+                'D = M',
+                "@%s" % self._get_addr(),
+                'M = D']
+
     def _get_addr(self):
         return Context.class_name + '.' + str(self.x)
 
@@ -255,6 +270,7 @@ class NonCompArithmCmd(BinaryArithmCmd):
                'A = A - 1']
         res += ['M = M ' + self._op_sign() + ' D']
         return res
+
 
 class SubCmd(NonCompArithmCmd):
     def _op_sign(self):
@@ -423,45 +439,45 @@ class CallCmd(VmCmd):
 
 class ReturnCmd(VmCmd):
     def translate(self):
-        return ['@5',          #BEGIN: store ret address to r14
+        return ['@5',  # BEGIN: store ret address to r14
                 'D = A',
                 '@LCL',
                 'A = M - D',
                 'D = M',
                 '@R14',
-                'M = D',        #END
-                '@SP',          #BEGIN: store return value to ARG_0
+                'M = D',  # END
+                '@SP',  # BEGIN: store return value to ARG_0
                 'A = M - 1',
                 'D = M',
                 '@ARG',
                 'A = M',
-                'M = D',        #END
-                'D = A + 1',    #BEGIN: set SP to ARG + 1
+                'M = D',  # END
+                'D = A + 1',  # BEGIN: set SP to ARG + 1
                 '@SP',
-                'M = D',        #END
-                '@LCL',         #BEGIN: restore THAT
+                'M = D',  # END
+                '@LCL',  # BEGIN: restore THAT
                 'D = M - 1',
                 '@R15',
                 'AM = D',
                 'D = M',
                 '@THAT',
-                'M = D',        #END
-                '@R15',         #BEGIN: restore THIS
+                'M = D',  # END
+                '@R15',  # BEGIN: restore THIS
                 'AM = M - 1',
                 'D = M',
                 '@THIS',
-                'M = D',        #END
-                '@R15',         #BEGIN: restore ARG
+                'M = D',  # END
+                '@R15',  # BEGIN: restore ARG
                 'AM = M - 1',
                 'D = M',
                 '@ARG',
-                'M = D',        #END
-                '@R15',         #BEGIN: restore LCL
+                'M = D',  # END
+                '@R15',  # BEGIN: restore LCL
                 'AM = M - 1',
                 'D = M',
                 '@LCL',
-                'M = D',        #END,
-                '@R14',         #BEGIN: jumping to return address,
+                'M = D',  # END,
+                '@R14',  # BEGIN: jumping to return address,
                 'A = M',
                 '0;JMP']
 
