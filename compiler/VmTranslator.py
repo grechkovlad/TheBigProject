@@ -31,6 +31,10 @@ class PushRegularSegmentCmd(PushCmd):
             return ['@%s' % self.name,
                     'A = M',
                     'D = M']
+        if self.x == 1:
+            return ['@%s' % self.name,
+                    'A = M + 1',
+                    'D = M']
         return ['@' + str(self.x),
                 'D = A',
                 '@' + self.name,
