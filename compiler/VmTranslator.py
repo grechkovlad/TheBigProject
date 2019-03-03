@@ -88,26 +88,22 @@ class PushFixedSegmentCmd(PushCmd):
 
 class PushStaticCmd(PushFixedSegmentCmd):
     def translate(self):
-        return ['@%s' % self._get_addr(),
+        return ['@%s' % Context.class_name + '.' + str(self.x),
                 'D = M',
                 '@SP',
                 'M = M + 1',
                 'A = M - 1',
                 'M = D']
 
-    def _get_addr(self):
-        return Context.class_name + '.' + str(self.x)
-
-    def _get_fixed_addr(self):
-        return '16'
-
 
 class PushTempCmd(PushFixedSegmentCmd):
-    def _get_addr(self):
-        return str(self.x)
-
-    def _get_fixed_addr(self):
-        return '5'
+    def translate(self):
+        return ['@%d' % (5 + self.x),
+                'D = M',
+                '@SP',
+                'M = M + 1',
+                'A = M - 1',
+                'M = D']
 
 
 class PushPointerCmd(PushCmd):
