@@ -174,14 +174,8 @@ class PopStaticCmd(PopFixedSegmentCmd):
         return ['@SP',
                 'AM = M - 1',
                 'D = M',
-                "@%s" % self._get_addr(),
+                "@%s" % Context.class_name + '.' + str(self.x),
                 'M = D']
-
-    def _get_addr(self):
-        return Context.class_name + '.' + str(self.x)
-
-    def _get_fixed_addr(self):
-        return '16'
 
 
 class PopTempCmd(PopFixedSegmentCmd):
@@ -191,12 +185,6 @@ class PopTempCmd(PopFixedSegmentCmd):
                 'D = M',
                 "@%d" % (5 + self.x),
                 'M = D']
-
-    def _get_addr(self):
-        return str(self.x)
-
-    def _get_fixed_addr(self):
-        return '5'
 
 
 class PopPointerCmd(PopCmd):
