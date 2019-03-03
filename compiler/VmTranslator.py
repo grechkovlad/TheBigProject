@@ -189,6 +189,13 @@ class PopStaticCmd(PopFixedSegmentCmd):
 
 
 class PopTempCmd(PopFixedSegmentCmd):
+    def translate(self):
+        return ['@SP',
+                'AM = M - 1',
+                'D = M',
+                "@%d" % (5 + self.x),
+                'M = D']
+
     def _get_addr(self):
         return str(self.x)
 
