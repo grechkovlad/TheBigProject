@@ -114,6 +114,8 @@ def jump_to_binary(jump):
 
 
 def dest_to_binary(dest):
+    if not dest in ['', 'M', 'D', 'A', 'MD', 'AM', 'AD', 'AMD']:
+        raise ValueError('Illegal destination: %s' % dest)
     res = ['0', '0', '0'];
     if dest.find('A') >= 0:
         res[0] = '1';
