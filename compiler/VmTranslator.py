@@ -203,33 +203,16 @@ class BinaryArithmCmd(ArithmCmd):
 
 
 class NonCompArithmCmd(BinaryArithmCmd):
+    def __init__(self, sign):
+        self._sign = sign
+
     def translate(self):
         res = ['@SP',
                'AM = M - 1',
                'D = M',
                'A = A - 1']
-        res += ['M = M ' + self._op_sign() + ' D']
+        res += ['M = M ' + self._sign + ' D']
         return res
-
-
-class SubCmd(NonCompArithmCmd):
-    def _op_sign(self):
-        return '-'
-
-
-class AddCmd(NonCompArithmCmd):
-    def _op_sign(self):
-        return '+'
-
-
-class AndCmd(NonCompArithmCmd):
-    def _op_sign(self):
-        return '&'
-
-
-class OrCmd(NonCompArithmCmd):
-    def _op_sign(self):
-        return '|'
 
 
 class CmpCmd(BinaryArithmCmd):
@@ -457,9 +440,9 @@ def parse_one_word(line):
     if line == 'return':
         return ReturnCmd()
     if line == 'add':
-        return AddCmd()
+        return NonCompArithmCmd('+')
     if line == 'sub':
-        return SubCmd()
+        return NonCompArithmCmd('-')
     if line == 'eq':
         return EqCmd()
     if line == 'gt':
@@ -467,9 +450,9 @@ def parse_one_word(line):
     if line == 'lt':
         return LtCmd()
     if line == 'and':
-        return AndCmd()
+        return NonCompArithmCmd('&')
     if line == 'or':
-        return OrCmd()
+        return NonCompArithmCmd('|')
     if line == 'neg':
         return NegCmd()
     if line == 'not':
