@@ -77,14 +77,6 @@ class PushFixedSegmentCmd(PushCmd):
     def __init__(self, val):
         self.x = val;
 
-    def _load_value_to_D(self):
-        return ['@' + self._get_addr(),
-                'D = A',
-                '@' + self._get_fixed_addr(),
-                'D = D + A',
-                'A = D',
-                'D = M'];
-
 
 class PushStaticCmd(PushFixedSegmentCmd):
     def translate(self):
