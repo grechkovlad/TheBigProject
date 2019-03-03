@@ -15,20 +15,12 @@ class MemoryCmd(VmCmd):
 
 
 class PushCmd(MemoryCmd):
-    def translate(self):
-        return self._load_value_to_D() + self._push_D_to_stack()
-
-    def _load_value_to_D(self):
-        raise NotImplementedError()
-
-    def _push_D_to_stack(self):
-        return ['@SP',
-                'M = M + 1',
-                'A = M - 1',
-                'M = D'];
+    ...
 
 
 class PushRegularSegmentCmd(PushCmd):
+    def translate(self):
+        return self._load_value_to_D() + self._push_D_to_stack()
 
     def __init__(self, val):
         self.x = val;
@@ -43,7 +35,13 @@ class PushRegularSegmentCmd(PushCmd):
                 '@' + self._get_segment_pointer_name(),
                 'D = D + M',
                 'A = D',
-                'D = M'];
+                'D = M']
+
+    def _push_D_to_stack(self):
+        return ['@SP',
+                'M = M + 1',
+                'A = M - 1',
+                'M = D']
 
 
 class PushLocalCmd(PushRegularSegmentCmd):
