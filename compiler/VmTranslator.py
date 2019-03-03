@@ -108,13 +108,23 @@ class PushPointerCmd(PushCmd):
 
 
 class PushPointerZeroCmd(PushPointerCmd):
-    def _get_segment_name(self):
-        return 'THIS';
+    def translate(self):
+        return ['@THIS',
+                'D = M',
+                '@SP',
+                'M = M + 1',
+                'A = M - 1',
+                'M = D']
 
 
 class PushPointerOneCmd(PushPointerCmd):
-    def _get_segment_name(self):
-        return 'THAT';
+    def translate(self):
+        return ['@THAT',
+                'D = M',
+                '@SP',
+                'M = M + 1',
+                'A = M - 1',
+                'M = D']
 
 
 class PopCmd(MemoryCmd):
