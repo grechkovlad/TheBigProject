@@ -51,6 +51,16 @@ class PushRegularSegmentCmd(PushCmd):
 
 class PushConstCmd(PushCmd):
     def translate(self):
+        if self.x == 0:
+            return ['@SP',
+                    'M = M + 1',
+                    'A = M - 1',
+                    'M = 0']
+        if self.x == 1:
+            return ['@SP',
+                    'M = M + 1',
+                    'A = M - 1',
+                    'M = 1']
         return ['@' + str(self.x),
                 'D = A',
                 '@SP',
