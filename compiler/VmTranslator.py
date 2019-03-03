@@ -22,17 +22,18 @@ class PushRegularSegmentCmd(PushCmd):
     def translate(self):
         return self._load_value_to_D() + self._push_D_to_stack()
 
-    def __init__(self, val):
+    def __init__(self, name, val):
+        self.name = name
         self.x = val;
 
     def _load_value_to_D(self):
         if self.x == 0:
-            return ['@%s' % self._get_segment_pointer_name(),
+            return ['@%s' % self.name,
                     'A = M',
                     'D = M']
         return ['@' + str(self.x),
                 'D = A',
-                '@' + self._get_segment_pointer_name(),
+                '@' + self.name,
                 'D = D + M',
                 'A = D',
                 'D = M']
@@ -42,26 +43,6 @@ class PushRegularSegmentCmd(PushCmd):
                 'M = M + 1',
                 'A = M - 1',
                 'M = D']
-
-
-class PushLocalCmd(PushRegularSegmentCmd):
-    def _get_segment_pointer_name(self):
-        return 'LCL'
-
-
-class PushThatCmd(PushRegularSegmentCmd):
-    def _get_segment_pointer_name(self):
-        return 'THAT'
-
-
-class PushThisCmd(PushRegularSegmentCmd):
-    def _get_segment_pointer_name(self):
-        return 'THIS'
-
-
-class PushArgCmd(PushRegularSegmentCmd):
-    def _get_segment_pointer_name(self):
-        return 'ARG'
 
 
 class PushConstCmd(PushCmd):
@@ -540,13 +521,13 @@ def parse_one_word(line):
 def parse_three_words(w1, w2, val):
     if w1 == 'push':
         if w2 == 'local':
-            return PushLocalCmd(val);
+            return PushRegularSegmentCmd("LCL", val);
         if w2 == 'argument':
-            return PushArgCmd(val);
+            return PushRegularSegmentCmd("ARG", val);
         if w2 == 'this':
-            return PushThisCmd(val);
+            return PushRegularSegmentCmd("THIS", val);
         if w2 == 'that':
-            return PushThatCmd(val);
+            return PushRegularSegmentCmd("THAT", val);
         if w2 == 'constant':
             return PushConstCmd(val);
         if w2 == 'static':
