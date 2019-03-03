@@ -238,36 +238,13 @@ class CmpCmd(BinaryArithmCmd):
 
 
 class LtCmd(CmpCmd):
-    def translate(self):
-        Context.cmp_count = Context.cmp_count + 1
-        return ['@SP',
-                'AM = M - 1',
-                'D = M',
-                'A = A - 1',
-                'M = M - D',
-                '@%d' % 0b0111111111111111,
-                'D = A + 1',
-                '@SP',
-                'A = M - 1',
-                'M = M & D']
-
     def _get_jump_cond(self):
         return 'JLT'
 
 
 class GtCmd(CmpCmd):
-    def translate(self):
-        Context.cmp_count = Context.cmp_count + 1
-        return ['@SP',
-                'AM = M - 1',
-                'D = M',
-                'A = A - 1',
-                'M = D - M',
-                '@%d' % 0b0111111111111111,
-                'D = A + 1',
-                '@SP',
-                'A = M - 1',
-                'M = M & D']
+    def _get_jump_cond(self):
+        return 'JGT'
 
 
 class EqCmd(CmpCmd):
