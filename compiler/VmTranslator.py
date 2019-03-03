@@ -34,6 +34,10 @@ class PushRegularSegmentCmd(PushCmd):
         self.x = val;
 
     def _load_value_to_D(self):
+        if self.x == 0:
+            return ['@%s' % self._get_segment_pointer_name(),
+                    'A = M',
+                    'D = M']
         return ['@' + str(self.x),
                 'D = A',
                 '@' + self._get_segment_pointer_name(),
@@ -102,9 +106,7 @@ class PushTempCmd(PushFixedSegmentCmd):
 
 
 class PushPointerCmd(PushCmd):
-    def _load_value_to_D(self):
-        return ['@' + self._get_segment_name(),
-                'D = M']
+    ...
 
 
 class PushPointerZeroCmd(PushPointerCmd):
