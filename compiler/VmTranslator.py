@@ -131,6 +131,16 @@ class PopRegularSegmentCmd(PopCmd):
         self.x = val;
 
     def _store_pointer_to_r13(self):
+        if self.x == 0:
+            return ['@' + self._get_segment_pointer_name(),
+                    'D = M',
+                    '@R13',
+                    'M = D']
+        if self.x == 1:
+            return ['@' + self._get_segment_pointer_name(),
+                    'D = M + 1',
+                    '@R13',
+                    'M = D']
         return ['@' + str(self.x),
                 'D = A',
                 '@' + self._get_segment_pointer_name(),
