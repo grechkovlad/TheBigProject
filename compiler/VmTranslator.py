@@ -158,15 +158,7 @@ class PopArgCmd(PopRegularSegmentCmd):
 class PopFixedSegmentCmd(PopCmd):
 
     def __init__(self, val):
-        self.x = val;
-
-    def _store_pointer_to_r13(self):
-        return ['@' + self._get_addr(),
-                'D = A',
-                '@' + self._get_fixed_addr(),
-                'D = D + A',
-                '@R13',
-                'M = D']
+        self.x = val
 
 
 class PopStaticCmd(PopFixedSegmentCmd):
