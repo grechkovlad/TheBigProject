@@ -183,22 +183,15 @@ class PopTempCmd(PopFixedSegmentCmd):
 
 
 class PopPointerCmd(PopCmd):
+    def __init__(self, segment_name):
+        self._name = segment_name
+
     def translate(self):
         return ['@SP',
                 'AM = M - 1',
                 'D = M',
-                '@%s' % self._get_segment_name(),
+                '@%s' % self._name,
                 'M = D']
-
-
-class PopPointerZeroCmd(PopPointerCmd):
-    def _get_segment_name(self):
-        return 'THIS';
-
-
-class PopPointerOneCmd(PopPointerCmd):
-    def _get_segment_name(self):
-        return 'THAT';
 
 
 class ArithmCmd(VmCmd):
@@ -537,9 +530,9 @@ def parse_three_words(w1, w2, val):
             return PopTempCmd(val)
         if w2 == 'pointer':
             if val == 0:
-                return PopPointerZeroCmd();
+                return PopPointerCmd("THIS");
             if val == 1:
-                return PopPointerOneCmd();
+                return PopPointerCmd("THAT");
     if w1 == 'call':
         return CallCmd(w2, val);
     if w1 == 'function':
