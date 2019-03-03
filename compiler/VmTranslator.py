@@ -125,8 +125,7 @@ class PopCmd(MemoryCmd):
 
     def _pop_to_pointer_r13(self):
         return ['@SP',
-                'M = M - 1',
-                'A = M',
+                'AM = M - 1',
                 'D = M',
                 '@R13',
                 'A = M',
@@ -244,8 +243,7 @@ class BinaryArithmCmd(ArithmCmd):
 class NonCompArithmCmd(BinaryArithmCmd):
     def translate(self):
         res = ['@SP',
-               'M = M - 1',
-               'A = M',
+               'AM = M - 1',
                'D = M',
                'A = A - 1']
         res += ['M = M ' + self._op_sign() + ' D']
@@ -275,8 +273,7 @@ class CmpCmd(BinaryArithmCmd):
     def translate(self):
         Context.cmp_count = Context.cmp_count + 1
         return ['@SP',
-                'M = M - 1',
-                'A = M',
+                'AM = M - 1',
                 'D = M',
                 'A = A - 1',
                 'D = M - D',
@@ -352,8 +349,7 @@ class IfGotoCmd(VmCmd):
 
     def translate(self):
         return ['@SP',
-                'M = M - 1',
-                'A = M',
+                'AM = M - 1',
                 'D = M',
                 '@%s' % get_simple_label_name(self.name),
                 'D;JNE'];
@@ -366,8 +362,7 @@ class CallCmd(VmCmd):
 
     def translate(self):
         Context.ret_count = Context.ret_count + 1;
-        return ['//call %s' % self.func,
-                '@%s' % get_ret_label_name(),
+        return ['@%s' % get_ret_label_name(),
                 'D = A',
                 '@SP',
                 'A = M',
