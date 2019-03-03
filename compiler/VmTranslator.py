@@ -102,8 +102,16 @@ class PushPointerCmd(PushCmd):
 
 
 class PopCmd(MemoryCmd):
+    ...
+
+
+class PopRegularSegmentCmd(PopCmd):
+
+    def __init__(self, val):
+        self.x = val
+
     def translate(self):
-        return self._store_pointer_to_r13() + self._pop_to_pointer_r13();
+        return self._store_pointer_to_r13() + self._pop_to_pointer_r13()
 
     def _pop_to_pointer_r13(self):
         return ['@SP',
@@ -112,12 +120,6 @@ class PopCmd(MemoryCmd):
                 '@R13',
                 'A = M',
                 'M = D']
-
-
-class PopRegularSegmentCmd(PopCmd):
-
-    def __init__(self, val):
-        self.x = val;
 
     def _store_pointer_to_r13(self):
         if self.x == 0:
