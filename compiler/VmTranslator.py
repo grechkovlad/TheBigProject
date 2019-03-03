@@ -63,13 +63,16 @@ class PushArgCmd(PushRegularSegmentCmd):
 
 
 class PushConstCmd(PushCmd):
+    def translate(self):
+        return ['@' + str(self.x),
+                'D = A',
+                '@SP',
+                'M = M + 1',
+                'A = M - 1',
+                'M = D']
 
     def __init__(self, val):
         self.x = val;
-
-    def _load_value_to_D(self):
-        return ['@' + str(self.x),
-                'D = A'];
 
 
 class PushFixedSegmentCmd(PushCmd):
