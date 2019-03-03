@@ -366,7 +366,8 @@ class CallCmd(VmCmd):
 
     def translate(self):
         Context.ret_count = Context.ret_count + 1;
-        return ['@%s' % get_ret_label_name(),
+        return ['//call %s' % self.func,
+                '@%s' % get_ret_label_name(),
                 'D = A',
                 '@SP',
                 'A = M',
@@ -420,56 +421,45 @@ class CallCmd(VmCmd):
 
 class ReturnCmd(VmCmd):
     def translate(self):
-        return ['@ARG',
-                'D = M',
-                '@R13',
-                'M = D',
+        return ['@5',          #BEGIN: store ret address to r14
+                'D = A',
                 '@LCL',
-                'A = M - 1',
-                'A = A - 1',
-                'A = A - 1',
-                'A = A - 1',
-                'A = A - 1',
+                'A = M - D',
                 'D = M',
                 '@R14',
-                'M = D',
-                '@LCL',
+                'M = D',        #END
+                '@SP',          #BEGIN: store return value to ARG_0
                 'A = M - 1',
-                'D = M',
-                '@THAT',
-                'M = D',
-                '@LCL',
-                'A = M - 1',
-                'A = A - 1',
-                'D = M',
-                '@THIS',
-                'M = D',
-                '@LCL',
-                'A = M - 1',
-                'A = A - 1',
-                'A = A - 1',
                 'D = M',
                 '@ARG',
-                'M = D',
-                '@LCL',
-                'A = M - 1',
-                'A = A - 1',
-                'A = A - 1',
-                'A = A - 1',
-                'D = M',
-                '@LCL',
-                'M = D',
-                '@SP',
-                'A = M - 1',
-                'D = M',
-                '@R13',
                 'A = M',
-                'M = D',
-                '@R13',
-                'D = M',
+                'M = D',        #END
+                'D = A + 1',    #BEGIN: set SP to ARG + 1
                 '@SP',
-                'M = D + 1',
-                '@R14',
+                'M = D',        #END
+                '@LCL',         #BEGIN: restore THAT
+                'D = M - 1',
+                '@R15',
+                'AM = D',
+                'D = M',
+                '@THAT',
+                'M = D',        #END
+                '@R15',         #BEGIN: restore THIS
+                'AM = M - 1',
+                'D = M',
+                '@THIS',
+                'M = D',        #END
+                '@R15',         #BEGIN: restore ARG
+                'AM = M - 1',
+                'D = M',
+                '@ARG',
+                'M = D',        #END
+                '@R15',         #BEGIN: restore LCL
+                'AM = M - 1',
+                'D = M',
+                '@LCL',
+                'M = D',        #END,
+                '@R14',         #BEGIN: jumping to return address,
                 'A = M',
                 '0;JMP']
 
