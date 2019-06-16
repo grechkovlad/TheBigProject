@@ -715,7 +715,7 @@ def compileSubroutineDecl(tokenizer, context):
     context.clearSubroutineLevel()
     subroutineType = tokenizer.currentToken.string_repr();
     if "method" == subroutineType:
-        context.updateWithArg("this", context.className)
+        context.updateWithArg(context.className, "this")
     tokenizer.advance();
     returnType = tokenizer.currentToken.string_repr();
     tokenizer.advance();
