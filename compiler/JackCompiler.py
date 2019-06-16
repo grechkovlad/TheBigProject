@@ -292,7 +292,8 @@ class Tokenizer():
     def _at_keyword(self, str):
         if not self._at_string(str):
             return False
-        if self._is_digit_at(self.i + len(str)) or self._is_letter_at(self.i + len(str)) or self._is_underscore_at(self.i + len(str)):
+        if self._is_digit_at(self.i + len(str)) or self._is_letter_at(self.i + len(str)) or self._is_underscore_at(
+                self.i + len(str)):
             return False
         return True
 
@@ -439,15 +440,16 @@ def compileLocalVarDecls(tokenizer, context):
 
 
 def compileExprList(tokenizer, context):
-    context.invocationArgsCount = 0
+    expr_list_len = 0
     isFirst = True;
     vmCode = []
     while not tokenizer.currentToken.is_closing_round():
-        context.invocationArgsCount = context.invocationArgsCount + 1
+        expr_list_len = expr_list_len + 1
         if not isFirst:
             tokenizer.advance();
         vmCode.extend(compileExpr(tokenizer, context))
         isFirst = False;
+    context.invocationArgsCount = expr_list_len
     return vmCode;
 
 
@@ -503,7 +505,6 @@ def compileStringConst(str):
     for chr in str:
         vmCode.extend(["push constant %d" % ord(chr), "call String.appendChar 2"])
     return vmCode
-
 
 
 def compileKeywordConst(keyword):
@@ -616,7 +617,7 @@ def compileLet(tokenizer, context):
     return vmCode;
 
 
-def compileIf(tokenizer, context): # TODO check and fix
+def compileIf(tokenizer, context):  # TODO check and fix
     tokenizer.advance();
     tokenizer.advance();
     condVmCode = compileExpr(tokenizer, context)
