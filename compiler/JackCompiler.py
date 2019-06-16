@@ -279,7 +279,7 @@ class Tokenizer():
             if self._at_string("//"):
                 self.i = self.text.find("\n", self.i) + 1;
                 continue;
-            if self._at_string("/**"):
+            if self._at_string("/*"):
                 self.i = self.text.find("*/", self.i) + 2;
                 continue;
             return;
@@ -430,7 +430,7 @@ def compileLocalVarDecl(tokenizer, context):
     name = tokenizer.currentToken.string_repr();
     context.updateWithLocal(type, name)
     tokenizer.advance();
-    compileVarNamesListTail(tokenizer, False, False, type, context)
+    compileVarNamesListTail(tokenizer, False, None, type, context)
     tokenizer.advance();
 
 
