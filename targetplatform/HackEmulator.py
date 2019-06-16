@@ -6,7 +6,7 @@ import numpy as np
 from targetplatform import *
 
 
-class HackSimulator:
+class HackEmulator:
 
     def __init__(self, rom, show_screen=False, fps_limit=10):
         self._ram = [0] * RAM_SIZE

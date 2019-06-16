@@ -1,6 +1,6 @@
 import unittest
 from test.vmtranslator import vm_to_hack
-from targetplatform.HackSimulator import HackSimulator
+from targetplatform.HackEmulator import HackEmulator
 from targetplatform import read_program
 
 
@@ -8,7 +8,7 @@ class VmTranslatorTestCase(unittest.TestCase):
     def _get_platform_to_run(self):
         hack_program_file = self._get_test_name() + ".hack"
         vm_to_hack(self._get_vm_source_path(), hack_program_file)
-        platform = HackSimulator(read_program(hack_program_file))
+        platform = HackEmulator(read_program(hack_program_file))
         return platform
 
     def tearDown(self):
