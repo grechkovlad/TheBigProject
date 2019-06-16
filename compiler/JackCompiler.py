@@ -429,7 +429,7 @@ def compileLocalVarDecl(tokenizer, context):
     name = tokenizer.currentToken.string_repr();
     context.updateWithLocal(type, name)
     tokenizer.advance();
-    compileVarNamesListTail(tokenizer, False, type, name, context)
+    compileVarNamesListTail(tokenizer, False, False, type, context)
     tokenizer.advance();
 
 
